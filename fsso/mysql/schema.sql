@@ -87,3 +87,13 @@ CREATE TABLE `fsso_refresh` (
   `expires_at` bigint(20) NOT NULL,
   CONSTRAINT `fsso_refresh_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `fsso_members` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- One entry per email address awaiting verification.
+-- Anyone in possesion of vtoken is assumed to own the email address.
+--
+CREATE TABLE `fsso_email_verify` (
+  `vtoken` varchar(32) NOT NULL PRIMARY KEY,
+  `email` varchar(255) NOT NULL,
+  `expires_at` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
