@@ -1,0 +1,10 @@
+# Copy this to .env and add your secrets.
+#
+# Works nicely with autoenv (https://github.com/kennethreitz/autoenv).
+
+# Main database
+export MYSQL_DSN="user:pw@/db_name"
+
+# Test database
+# The test suite will trash this.  Make it different from MYSQL_DSN.
+export MYSQL_TEST_DSN="user:pw@/test_db_name"
