@@ -2,9 +2,9 @@ package sso
 
 // Type AuthReply is returned from the auth functions.
 type AuthReply struct {
-  Rtoken string
-  Rtoken_expires int64
-  Member *Member
+  Rtoken string         `json:"rtoken"`
+  RtokenExpires int64   `json:"rtoken_expires"`
+  Member *Member        `json:"member"`
 }
 
 // AuthEmail validates an email/password combination and either signs in the

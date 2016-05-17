@@ -2,8 +2,8 @@ package sso
 
 // Type TokenReply is returned from the token functions.
 type TokenReply struct {
-  Atoken string
-  Member *Member
+  Atoken string   `json:"atoken"`
+  Member *Member  `json:"member"`
 }
 
 // TokenEmail validates an email/password combination and either returns
