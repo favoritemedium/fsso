@@ -2,14 +2,14 @@
 // via email/password or social network.
 package sso
 
-import(
+import (
 )
 
 // Type Member contains basic member information.
 
 type Member struct {
-  Id int64         `json:"-"`
-  Email string     `json:"email"`
-  ShortName string `json:"shortname"`
-  FullName string  `json:"fullname"`
+	Id        int64  `json:"-"`
+	Email     string `json:"email"`
+	ShortName string `json:"shortname"`
+	FullName  string `json:"fullname"`
 }
