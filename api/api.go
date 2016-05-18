@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/favoritemedium/fsso/sso"
 )
@@ -41,8 +42,16 @@ func wrap(handler func(*http.Request, *sso.Member, Parameters) (interface{}, err
 			return
 		}
 
-		// m := sso.Member{}
-		dataOut, err := handler(r, nil, dataIn)
+		m, err := sso.CurrentMember(r)
+		if err != nil {
+			// We have an unexpected error (such as database failure).
+			// Log it so that we can debug.
+			log.Println(err)
+			w.WriteHeader(ErrUnknown.Status)
+			enc.Encode(&ErrUnknown)
+		}
+
+		dataOut, err := handler(r, m, dataIn)
 		if err != nil {
 			if xerr, ok := err.(ErrorResponse); ok {
 				// If our error is an instance of ErrorResponse, that means that the
@@ -50,8 +59,7 @@ func wrap(handler func(*http.Request, *sso.Member, Parameters) (interface{}, err
 				w.WriteHeader(xerr.Status)
 				enc.Encode(&xerr)
 			} else {
-				// We have an unexpected error (such as database failure).
-				// Log it so that we can debug.
+				// Another unexpected error.  Log it.
 				log.Println(err)
 				w.WriteHeader(ErrUnknown.Status)
 				enc.Encode(&ErrUnknown)
@@ -66,6 +74,7 @@ func wrap(handler func(*http.Request, *sso.Member, Parameters) (interface{}, err
 // InitApi adds handlers for all the API endpoints.
 // prefix should probably be "/api/auth/".
 func Initialize(prefix string) {
+	sso.InitDB(os.Getenv("MYSQL_TEST_DSN"))
 	http.HandleFunc(prefix+"signin", wrap(doSignin))
 	http.HandleFunc(prefix+"connect", wrap(doConnect))
 	http.HandleFunc(prefix+"signout", wrap(notImplemented))
