@@ -66,11 +66,11 @@ func wrap(handler func(*http.Request, *sso.Member, Parameters) (interface{}, err
 // InitApi adds handlers for all the API endpoints.
 // prefix should probably be "/api/auth/".
 func Initialize(prefix string) {
-	http.HandleFunc(prefix+"auth", wrap(doAuth))
-	http.HandleFunc(prefix+"token", wrap(doToken))
+	http.HandleFunc(prefix+"signin", wrap(doSignin))
+	http.HandleFunc(prefix+"connect", wrap(doConnect))
 	http.HandleFunc(prefix+"signout", wrap(notImplemented))
-	http.HandleFunc(prefix+"email", wrap(notImplemented))
-	http.HandleFunc(prefix+"verify", wrap(notImplemented))
+	http.HandleFunc(prefix+"email/check", wrap(notImplemented))
+	http.HandleFunc(prefix+"email/verify", wrap(notImplemented))
 	http.HandleFunc(prefix+"new", wrap(notImplemented))
 	http.HandleFunc(prefix+"password", wrap(notImplemented))
 	http.HandleFunc(prefix+"list", wrap(notImplemented))
@@ -82,41 +82,41 @@ func Initialize(prefix string) {
 	http.HandleFunc(prefix+"remove", wrap(notImplemented))
 }
 
-// doAuth handles the /auth endpoint.
-func doAuth(r *http.Request, m *sso.Member, p Parameters) (interface{}, error) {
+// doSignin handles the /signin endpoint.
+func doSignin(r *http.Request, m *sso.Member, p Parameters) (interface{}, error) {
 
 	if r.Method != "POST" {
 		return nil, ErrMethodNotAllowed
 	}
 
 	if p.HasExactly("email", "password") && p.AreString("email", "password") {
-		return sso.AuthEmail(p["email"].(string), p["password"].(string))
+		return sso.SigninEmail(p["email"].(string), p["password"].(string))
 	}
 
 	if p.HasExactly("rtoken") && p.AreString("rtoken") {
-		return sso.AuthRefresh(p["rtoken"].(string))
+		return sso.SigninRefresh(p["rtoken"].(string))
 	}
 
 	if p.HasExactly("provider", "id_token") && p.AreString("provider", "id_token") {
-		return sso.AuthSocial(p["provider"].(string), p["id_token"].(string))
+		return sso.SigninSocial(p["provider"].(string), p["id_token"].(string))
 	}
 
 	return nil, ErrBadParameters
 }
 
-// doToken handles the /token endpoint.
-func doToken(r *http.Request, m *sso.Member, p Parameters) (interface{}, error) {
+// doConnect handles the /connect endpoint.
+func doConnect(r *http.Request, m *sso.Member, p Parameters) (interface{}, error) {
 
 	if r.Method != "POST" {
 		return nil, ErrMethodNotAllowed
 	}
 
 	if p.HasExactly("email", "password") && p.AreString("email", "password") {
-		return sso.TokenEmail(p["email"].(string), p["password"].(string))
+		return sso.ConnectEmail(p["email"].(string), p["password"].(string))
 	}
 
 	if p.HasExactly("provider", "id_token") && p.AreString("provider", "id_token") {
-		return sso.TokenSocial(p["provider"].(string), p["id_token"].(string))
+		return sso.ConnectSocial(p["provider"].(string), p["id_token"].(string))
 	}
 
 	return nil, ErrBadParameters
