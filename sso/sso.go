@@ -132,7 +132,7 @@ func CurrentMember(r *http.Request) (*Member, error) {
 	// call, which would be really awful nearly impossible-to-find sporadic  bug.
 	// If the session has already been dropped, then this update has no effect.
 	db.Exec("UPDATE "+activeTable+" SET active_at=?, ip=? WHERE atoken=?",
-		time.Now().Unix(), r.RemoteAddr, atoken)
+		timestamp(), r.RemoteAddr, atoken)
 
 	if err := db.QueryRow(
 		"SELECT member_id, useragent, is_session, data FROM "+activeTable+" WHERE atoken=?",
@@ -168,4 +168,9 @@ func CurrentMember(r *http.Request) (*Member, error) {
 	m.aToken = atoken
 	m.data = data
 	return &m, nil
+}
+
+// timestamp returns the rurrent unix time.  Tests could override this.
+func timestamp() int64 {
+  return time.Now().Unix()
 }
